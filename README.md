@@ -1,2 +1,2 @@
 # mini_projekt_Bartosz_Fijalkowski
-Mini projekt_class_dataset
+Mini projekt
