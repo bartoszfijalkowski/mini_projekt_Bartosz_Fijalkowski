@@ -51,7 +51,7 @@ class Dataset:
             class_counts[class_name] = class_counts.get(class_name, 0) + 1
         return [(key, value) for key, value in class_counts.items()]
 
-    def data_split(self, train_pct=0.7, test_pct=0.2, val_pct=0.1, seed=None):
+    def data_split(self, train_pct=0.7, test_pct=0.2, wal_pct=0.1, seed=None):
         """
         Dzieli dane na trzy podzbiory:
         - Dane treningowe: domyślnie 70%
@@ -61,11 +61,11 @@ class Dataset:
 
         :param train_pct: Proporcja danych treningowych.
         :param test_pct: Proporcja danych testowych.
-        :param val_pct: Proporcja danych walidacyjnych.
+        :param wal_pct: Proporcja danych walidacyjnych.
         :param seed: Ziarno losowości dla powtarzalności wyników.
         :return: Trzy listy reprezentujące dane treningowe, testowe i walidacyjne.
         """
-        total_ratio = train_pct + test_pct + val_pct
+        total_ratio = train_pct + test_pct + wal_pct
         if abs(total_ratio - 1.0) > 1e-6:
             raise ValueError(f'Suma wartości procentowych musi wynosić 1.0, otrzymano {total_ratio}')
 
@@ -108,8 +108,8 @@ if __name__ == "__main__":
     print("Klasy decyzyjne:", ds.get_number_of_classes())
 
     train_data, test_data, val_data = ds.data_split(seed=42)
-    print(f"Liczba rekordów w danych treningowych: {len(train_data)}")
-    print(f"Liczba rekordów w danych testowych: {len(test_data)}")
-    print(f"Liczba rekordów w danych walidacyjnych: {len(val_data)}")
+    print(f"Liczba rekordów danych treningowych: {len(train_data)}")
+    print(f"Liczba rekordów danych testowych: {len(test_data)}")
+    print(f"Liczba rekordów danych walidacyjnych: {len(val_data)}")
 
     ds.save_to_csv(train_data, 'train_data.csv')
