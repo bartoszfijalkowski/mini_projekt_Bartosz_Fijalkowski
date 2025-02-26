@@ -11,13 +11,12 @@ class Dataset:
 
     def read_data(self, filepath: str, header=True, delimiter=',', class_col_index=-1, encoding="utf-8"):
         """
-        Wczytuje dane z pliku CSV. Jeśli header = True, pierwszy wiersz to etykiety kolumn.
-        Usuwa znak nowej linii \n na końcu każdej linii w celu uniknięcia problemów z wypisywaniem danych.
+        Wczytuje dane z pliku CSV. Jeśli header=True, pierwszy wiersz to etykiety kolumn.
+        Usuwa znak nowej linii \n na końcu każdej linii, aby uniknąć problemów z wypisywaniem danych.
 
         :param filepath: Ścieżka do pliku CSV.
         :param header: Flaga określająca, czy pierwszy wiersz zawiera etykiety kolumn (domyślnie True).
         :param delimiter: Separator pól w pliku (domyślnie przecinek).
-        :param class_col_index: Indeks kolumny zawierającej klasy decyzyjne (domyślnie ostatnia kolumna).
         :param encoding: Kodowanie pliku (domyślnie UTF-8).
         """
         self.class_column_index = class_col_index
@@ -52,21 +51,21 @@ class Dataset:
             class_counts[class_name] = class_counts.get(class_name, 0) + 1
         return [(key, value) for key, value in class_counts.items()]
 
-    def data_split(self, train_pct=0.7, test_pct=0.2, val_pct=0.1, seed=None):
+    def data_split(self, train_pct=0.7, test_pct=0.2, wal_pct=0.1, seed=None):
         """
         Dzieli dane na trzy podzbiory:
-        - Dane treningowe: domyślnie 70%)
-        - Dane testowe: domyślnie 20%)
-        - Dane walidacyjne: domyślnie 10%)
+        - Dane treningowe: domyślnie 70%
+        - Dane testowe: domyślnie 20%
+        - Dane walidacyjne: domyślnie 10%
         Suma procentów 1.0.
 
         :param train_pct: Proporcja danych treningowych.
         :param test_pct: Proporcja danych testowych.
-        :param val_pct: Proporcja danych walidacyjnych.
+        :param wal_pct: Proporcja danych walidacyjnych.
         :param seed: Ziarno losowości dla powtarzalności wyników.
         :return: Trzy listy reprezentujące dane treningowe, testowe i walidacyjne.
         """
-        total_ratio = train_pct + test_pct + val_pct
+        total_ratio = train_pct + test_pct + wal_pct
         if abs(total_ratio - 1.0) > 1e-6:
             raise ValueError(f'Suma wartości procentowych musi wynosić 1.0, otrzymano {total_ratio}')
 
@@ -101,25 +100,6 @@ class Dataset:
         except IOError as err:
             print(f"Błąd zapisu do pliku: {err}")
 
-    def print_data(self, start=0, end=None):
-        """
-        Wypisuje dane datasetu. Można podać zakres wierszy.
-
-        :param start: Indeks początkowy.
-        :param end: Indeks końcowy (domyślnie cały zbiór).
-        """
-        for row in self.data[start:end]:
-            print(row)
-
-    def get_rows_by_class(self, class_value):
-        """
-        Zwraca wiersze, które należą do podanej klasy decyzyjnej.
-
-        :param class_value: Wartość klasy decyzyjnej.
-        :return: Lista wierszy należących do tej klasy.
-        """
-        return [row for row in self.data if row[self.class_column_index] == class_value]
-
 
 if __name__ == "__main__":
     ds = Dataset()
@@ -127,14 +107,9 @@ if __name__ == "__main__":
     print("Etykiety kolumn:", ds.get_labels())
     print("Klasy decyzyjne:", ds.get_number_of_classes())
 
-    train_set, test_set, val_set = ds.data_split(seed=42)
-    print(f"Liczba rekordów treningowych: {len(train_set)}")
-    print(f"Liczba rekordów testowych: {len(test_set)}")
-    print(f"Liczba rekordów walidacyjnych: {len(val_set)}")
+    train_data, test_data, val_data = ds.data_split(seed=42)
+    print(f"Liczba rekordów danych treningowych: {len(train_data)}")
+    print(f"Liczba rekordów danych testowych: {len(test_data)}")
+    print(f"Liczba rekordów danych walidacyjnych: {len(val_data)}")
 
-    ds.save_to_csv(train_set, 'train_data.csv')
-
-    print("Przykładowe dane:")
-    ds.print_data(0, 6)
-    print("Dane dla klasy Iris-setosa:")
-    print(ds.get_rows_by_class("Iris-setosa"))
+    ds.save_to_csv(train_data, 'train_data.csv')
